@@ -1,0 +1,36 @@
+macros:
+  - name: scd2_asof_join
+    description: >
+      Point-in-time ("as-of") join condition between a fact table and a Type 2
+      dimension: matches the fact row's business key to the dimension row
+      that was valid at the fact's event timestamp, not just the current
+      version. Returns a boolean ON-clause condition, not a full join
+      statement -- splice it into your own left join's on-clause.
+    arguments:
+      - name: fact_alias
+        type: string
+        description: Table alias of the fact side in the join.
+      - name: fact_key
+        type: string or list
+        description: Fact-side business key column(s).
+      - name: fact_ts
+        type: string
+        description: Fact-side event timestamp column.
+      - name: dim_alias
+        type: string
+        description: Table alias of the dimension side in the join.
+      - name: dim_key
+        type: string or list
+        description: >
+          Dimension-side business key column(s). Must have the same number
+          of columns as fact_key, in matching order.
+      - name: valid_from_column
+        type: string
+        description: >
+          Dimension's "valid from" column. Defaults to 'dbt_valid_from', the
+          column dbt's native snapshot mechanism creates.
+      - name: valid_to_column
+        type: string
+        description: >
+          Dimension's "valid to" column. Defaults to 'dbt_valid_to', the
+          column dbt's native snapshot mechanism creates.

@@ -1,0 +1,5 @@
+customer_id,customer_key,status,dbt_valid_from,dbt_valid_to
+1,cust_1_v1,active,2026-01-01 00:00:00,
+2,cust_2_v1,active,2026-01-01 00:00:00,2026-02-01 00:00:00
+2,cust_2_v2,inactive,2026-02-01 00:00:00,
+3,cust_3_v1,active,2026-01-01 00:00:00,2026-01-15 00:00:00

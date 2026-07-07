@@ -1,0 +1,14 @@
+macros:
+  - name: scd2_current_flag
+    description: >
+      Returns a comma-prefixed `_is_current` boolean column for use in a
+      model's final select over an SCD Type 2 snapshot table. Centralizes the
+      "is this the current version of this record" convention (valid_to IS
+      NULL) in one place instead of each downstream model re-deriving it.
+    arguments:
+      - name: valid_to_column
+        type: string
+        description: >
+          Name of the "valid to" column on the snapshot relation being
+          queried. Defaults to 'dbt_valid_to', the column dbt's native
+          snapshot mechanism creates.

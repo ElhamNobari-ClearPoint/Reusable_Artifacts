@@ -1,0 +1,13 @@
+models:
+  - name: test_scd2_current_flag
+    description: Validates that scd2_current_flag() correctly derives _is_current from dbt_valid_to.
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+      - name: _is_current
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [true, false]

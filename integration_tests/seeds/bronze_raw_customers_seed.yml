@@ -1,0 +1,5 @@
+seeds:
+  - name: bronze_raw_customers_seed
+    config:
+      column_types:
+        _loaded_at: timestamp_ntz

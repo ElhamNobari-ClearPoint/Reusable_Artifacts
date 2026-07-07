@@ -1,0 +1,8 @@
+models:
+  - name: test_dedupe_latest_record
+    description: Validates that dedupe_latest_record() collapses raw Bronze rows to one current row per business key.
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null

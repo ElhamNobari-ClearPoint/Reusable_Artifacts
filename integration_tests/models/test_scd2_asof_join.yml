@@ -1,0 +1,8 @@
+models:
+  - name: test_scd2_asof_join
+    description: Validates that scd2_asof_join() resolves each fact row to the dimension version valid at its event timestamp.
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null

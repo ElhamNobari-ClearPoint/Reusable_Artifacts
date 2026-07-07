@@ -1,0 +1,13 @@
+macros:
+  - name: audit_columns
+    description: >
+      Returns a comma-prefixed list of standard audit columns (_loaded_at,
+      _dbt_invocation_id, _load_source) for use in a model's final select
+      statement. Intended for Bronze -> Silver staging models to record when
+      and by which dbt invocation a row was produced.
+    arguments:
+      - name: load_source
+        type: string
+        description: >
+          Optional override for the _load_source column value. Defaults to
+          the current model's identifier (this.identifier) when not supplied.

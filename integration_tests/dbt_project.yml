@@ -1,0 +1,11 @@
+name: 'clearpoint_dbt_utils_integration_tests'
+version: '1.0.0'
+config-version: 2
+
+profile: 'integration_tests'
+
+require-dbt-version: [">=1.7.0", "<2.0.0"]
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]

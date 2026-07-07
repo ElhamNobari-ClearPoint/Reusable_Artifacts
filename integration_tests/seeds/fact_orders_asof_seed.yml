@@ -1,0 +1,5 @@
+seeds:
+  - name: fact_orders_asof_seed
+    config:
+      column_types:
+        order_date: timestamp_ntz

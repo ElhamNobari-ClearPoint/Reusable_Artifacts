@@ -1,0 +1,18 @@
+macros:
+  - name: dedupe_latest_record
+    description: >
+      Generates a QUALIFY ROW_NUMBER() clause to collapse raw Bronze rows
+      down to one current row per business key, for use in Bronze -> Silver
+      ODS staging models. Snowflake-specific (QUALIFY is not standard ANSI SQL).
+    arguments:
+      - name: partition_by
+        type: string or list
+        description: Business key column(s) to dedupe by.
+      - name: order_by
+        type: string or list
+        description: Recency column(s) determining which row wins.
+      - name: order_direction
+        type: string
+        description: >
+          'asc' or 'desc'. Defaults to 'desc' (the row with the latest
+          order_by value wins).

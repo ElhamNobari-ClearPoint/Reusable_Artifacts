@@ -1,0 +1,7 @@
+customer_id,name,email,_loaded_at
+1,Alice,alice_old@example.com,2026-01-01 00:00:00
+1,Alice,alice_new@example.com,2026-01-02 00:00:00
+2,Bob,bob@example.com,2026-01-01 00:00:00
+2,Bob,bob_middle@example.com,2026-01-02 00:00:00
+2,Bob,bob_updated@example.com,2026-01-03 00:00:00
+3,Carol,carol@example.com,2026-01-01 00:00:00

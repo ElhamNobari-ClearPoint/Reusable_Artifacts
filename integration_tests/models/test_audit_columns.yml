@@ -1,0 +1,19 @@
+models:
+  - name: test_audit_columns
+    description: Validates that audit_columns() produces populated, non-null audit fields.
+    columns:
+      - name: id
+        tests:
+          - not_null
+      - name: _loaded_at
+        tests:
+          - not_null
+      - name: _dbt_invocation_id
+        tests:
+          - not_null
+      - name: _load_source
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['test_audit_columns']

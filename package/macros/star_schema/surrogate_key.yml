@@ -1,0 +1,13 @@
+macros:
+  - name: surrogate_key
+    description: >
+      Standardized surrogate key generation for star schema dimension tables.
+      Thin wrapper around dbt_utils.generate_surrogate_key() enforcing this
+      package's naming convention: surrogate key columns must end in '_key'.
+    arguments:
+      - name: alias
+        type: string
+        description: Name for the surrogate key column. Must end with '_key'.
+      - name: field_list
+        type: list
+        description: Natural/business key column(s) to hash into the surrogate key.

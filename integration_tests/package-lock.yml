@@ -1,0 +1,7 @@
+packages:
+  - local: ../package
+    name: clearpoint_dbt_utils
+  - name: dbt_utils
+    package: dbt-labs/dbt_utils
+    version: 1.4.1
+sha1_hash: 2bea9ac74e714c1ea181bd445a52cafb181fb631

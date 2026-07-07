@@ -1,0 +1,6 @@
+seeds:
+  - name: dim_customer_asof_seed
+    config:
+      column_types:
+        dbt_valid_from: timestamp_ntz
+        dbt_valid_to: timestamp_ntz
