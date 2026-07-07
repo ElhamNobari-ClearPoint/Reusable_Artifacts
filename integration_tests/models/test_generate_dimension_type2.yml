@@ -4,6 +4,10 @@ models:
       Validates generate_dimension() for a Type-2 (SCD2 snapshot-sourced)
       dimension, using a composite business_key (natural key + dbt_valid_from)
       so the surrogate key is unique per historical row, not just per customer.
+    tests:
+      - clearpoint_dbt_utils.one_current_record_per_key:
+          arguments:
+            business_key: customer_id
     columns:
       - name: customer_key
         tests:

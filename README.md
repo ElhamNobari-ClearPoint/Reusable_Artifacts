@@ -147,6 +147,20 @@ For a **Type-2** dimension (`source_relation` is an SCD2 snapshot), pass `includ
 
 Each `dimension_lookups` entry needs `relation`, a unique `alias`, `fact_key`/`dim_key` (join columns — string or list), and `surrogate_key_column` (the column to pull from the dimension). Add `asof: true` and `fact_ts` for a point-in-time lookup against an SCD2 dimension; omit them for a plain equality join against a Type-1 dimension. `generate_fact()` does not generate a surrogate key for the fact row itself — `fact_key` is selected as-is.
 
+`one_current_record_per_key` is a generic dbt test for Type-2 dimensions, asserting no business key has more than one current (`_is_current = true`) row:
+
+```yaml
+# schema.yml
+models:
+  - name: dim_customer
+    tests:
+      - clearpoint_dbt_utils.one_current_record_per_key:
+          arguments:
+            business_key: customer_id
+```
+
+It deliberately does **not** flag a business key with *zero* current records as a failure — a hard-deleted key (via `invalidate_hard_deletes=true`, this package's recommended SCD2 pattern) legitimately has zero current rows, and that's correct, not a bug. `business_key` accepts a single column or a list; `current_flag_column` defaults to `_is_current` (what `scd2_current_flag()` produces) but can be overridden.
+
 ## Dependencies
 
 This package depends on [dbt-labs/dbt_utils](https://github.com/dbt-labs/dbt-utils).

@@ -1,0 +1,16 @@
+macros:
+  - name: one_current_record_per_key
+    description: >
+      Generic dbt test for Type-2 (SCD2) dimensions: asserts no business key
+      has more than one current row. Deliberately does not flag zero current
+      records -- a hard-deleted business key legitimately has zero, which is
+      correct, not a bug.
+    arguments:
+      - name: business_key
+        type: string or list
+        description: Natural/business key column(s).
+      - name: current_flag_column
+        type: string
+        description: >
+          Boolean "is current" column. Defaults to '_is_current', the column
+          scd2_current_flag() produces.

@@ -17,7 +17,7 @@ package/               — the actual installable dbt package (this is the `loca
   packages.yml
   macros/
     audit/        — standard audit/metadata columns
-    scd/          — SCD Type 2: downstream-consumption macros only, NOT snapshot-config macros (see below)
+    scd/          — SCD Type 2: downstream-consumption macros only, NOT snapshot-config macros (see below); includes one_current_record_per_key, a generic test
     staging/      — Bronze -> Silver ODS staging patterns (e.g. dedupe_latest_record, Snowflake QUALIFY-based)
     star_schema/  — dimension/fact table generators: surrogate_key (wraps dbt_utils.generate_surrogate_key with a '_key'-suffix naming rule), scd2_asof_join (fact-to-SCD2-dimension point-in-time join condition), generate_dimension and generate_fact (full-statement generators composing the other star_schema/audit macros)
     utils/        — shared helpers used by the above
@@ -39,6 +39,7 @@ Each macro file `package/macros/<area>/<macro_name>.sql` has a sibling `package/
 - Most macros return composable snippets (column lists, ON-clause conditions, QUALIFY clauses), not full statements — this is deliberate, confirmed with the user, and should stay the default. `generate_dimension()` and `generate_fact()` are the intentional exceptions (full-statement generators, by explicit user choice) — don't casually convert other macros to this shape without the same kind of confirmation.
 - `generate_fact()`'s `dimension_lookups` argument is a list of plain dicts (not a Jinja/dbt object) — keys are accessed with `lookup['key']` and `lookup.get('key', default)` inside the macro. This works because dbt's Jinja environment allows normal Python dict method calls; don't assume this generalizes to arbitrary objects passed through `ref()`/`source()`, which are `Relation` objects, not dicts.
 - **Type-2 dimension gotcha**: when calling `generate_dimension()` (or `surrogate_key()` directly) against an SCD2 snapshot, `business_key` must be a composite of the natural key plus a version discriminator (e.g. `['customer_id', 'dbt_valid_from']`), never just the natural key alone. `surrogate_key()` hashes exactly what it's given — a natural-key-only surrogate key collapses every historical version of the same entity to one identical key, silently breaking row-level uniqueness. Verified with an integration test (`assert_generate_dimension_type2_keys_unique_per_version.sql`) — don't regress this.
+- **`one_current_record_per_key` zero-current design**: deliberately only flags a business key with MORE THAN ONE current row, never zero. An earlier draft also flagged zero, but that directly conflicts with `invalidate_hard_deletes=true` (this package's recommended SCD2 pattern) — a hard-deleted key legitimately has zero current rows. Confirmed with the user before building. The failure-detection path (does it actually catch a real duplicate?) was verified once with a temporary seed + wired test that was then removed — don't re-add a permanently-failing fixture to the suite; a clean `dbt build` with zero failures is the standing bar for this repo.
 
 ## Medallion terminology used in this package
 

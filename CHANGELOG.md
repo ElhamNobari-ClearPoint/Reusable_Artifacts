@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.3.0 - 2026-07-07
+
+A generic dbt test for Type-2 dimension quality, verified end-to-end against Snowflake via `integration_tests/`.
+
+### Added
+
+- **SCD Type 2**: `one_current_record_per_key` — generic dbt test asserting no business key has more than one current (`_is_current = true`) row. Deliberately does not flag zero current records, since a hard-deleted key (via `invalidate_hard_deletes=true`, this package's recommended SCD2 pattern) legitimately has zero.
+
 ## 0.2.0 - 2026-07-07
 
 Full-statement star schema generators, built on top of the 0.1.0 primitives (`surrogate_key()`, `audit_columns()`, `scd2_current_flag()`, `scd2_asof_join()`), verified end-to-end against Snowflake via `integration_tests/`.
