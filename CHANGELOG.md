@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.4.0 - 2026-07-07
+
+A generic dbt test for fact table join integrity, verified end-to-end against Snowflake via `integration_tests/`.
+
+### Added
+
+- **Star schema**: `fact_join_fanout_check` — generic dbt test asserting a fact table's dimension joins did not silently duplicate or drop rows, by comparing per-key row counts between the pre-join fact source and the fact model's output. Complements (rather than duplicates) dbt's built-in `unique`/`not_null`/`relationships` tests, which don't catch join fanout.
+
 ## 0.3.0 - 2026-07-07
 
 A generic dbt test for Type-2 dimension quality, verified end-to-end against Snowflake via `integration_tests/`.

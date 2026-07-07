@@ -4,6 +4,11 @@ models:
       Validates generate_fact(), combining a point-in-time (asof) dimension
       lookup against an SCD2 customer dimension with a plain equality lookup
       against a Type-1 product dimension.
+    tests:
+      - clearpoint_dbt_utils.fact_join_fanout_check:
+          arguments:
+            source_relation: ref('fact_orders_full_seed')
+            fact_key: order_id
     columns:
       - name: order_id
         tests:

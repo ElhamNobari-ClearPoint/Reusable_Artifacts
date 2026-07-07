@@ -1,0 +1,16 @@
+macros:
+  - name: fact_join_fanout_check
+    description: >
+      Generic dbt test for fact tables: asserts that resolving
+      dimension_lookups (or any hand-written dimension joins) did not
+      silently duplicate or drop rows, by comparing per-key row counts
+      between the pre-join fact source and the fact model's output.
+    arguments:
+      - name: source_relation
+        type: relation
+        description: The fact source before any dimension joins.
+      - name: fact_key
+        type: string or list
+        description: >
+          Natural/business key column(s) of the fact source. Must be unique
+          in source_relation for this test to be meaningful.

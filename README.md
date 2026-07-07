@@ -161,6 +161,21 @@ models:
 
 It deliberately does **not** flag a business key with *zero* current records as a failure — a hard-deleted key (via `invalidate_hard_deletes=true`, this package's recommended SCD2 pattern) legitimately has zero current rows, and that's correct, not a bug. `business_key` accepts a single column or a list; `current_flag_column` defaults to `_is_current` (what `scd2_current_flag()` produces) but can be overridden.
 
+`fact_join_fanout_check` is a generic dbt test for fact tables: it catches a "fanout" bug that `unique`/`not_null`/`relationships` don't — a dimension lookup silently duplicating (or dropping) fact rows because a dimension had more than one matching row for some fact_key/timestamp (e.g. overlapping SCD2 validity windows, or a data quality issue upstream):
+
+```yaml
+# schema.yml
+models:
+  - name: fct_orders
+    tests:
+      - clearpoint_dbt_utils.fact_join_fanout_check:
+          arguments:
+            source_relation: ref('stg_orders')
+            fact_key: order_id
+```
+
+It compares, per `fact_key` value, the row count in `source_relation` (before any dimension joins) against the row count in the fact model itself (after them) — any mismatch fails. `fact_key` must be unique in `source_relation` for the comparison to be meaningful.
+
 ## Dependencies
 
 This package depends on [dbt-labs/dbt_utils](https://github.com/dbt-labs/dbt-utils).
