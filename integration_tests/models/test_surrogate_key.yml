@@ -1,6 +1,11 @@
 models:
   - name: test_surrogate_key
     description: Validates that surrogate_key() produces unique, non-null keys per business key.
+    tests:
+      - clearpoint_dbt_utils.surrogate_key_is_deterministic:
+          arguments:
+            business_key: customer_id
+            surrogate_key_column: customer_key
     columns:
       - name: customer_key
         tests:

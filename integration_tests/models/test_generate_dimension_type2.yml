@@ -11,6 +11,10 @@ models:
       - clearpoint_dbt_utils.no_overlapping_scd2_periods:
           arguments:
             business_key: customer_id
+      - clearpoint_dbt_utils.surrogate_key_is_deterministic:
+          arguments:
+            business_key: [customer_id, dbt_valid_from]
+            surrogate_key_column: customer_key
     columns:
       - name: customer_key
         tests:

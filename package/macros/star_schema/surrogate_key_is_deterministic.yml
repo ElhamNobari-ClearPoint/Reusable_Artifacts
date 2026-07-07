@@ -1,0 +1,17 @@
+macros:
+  - name: surrogate_key_is_deterministic
+    description: >
+      Generic dbt test for dimension tables: asserts each distinct
+      business_key value maps to exactly one surrogate_key_column value.
+      Catches a surrogate key generation bug that a plain `unique` test on
+      the surrogate key column would miss. For Type-2 (SCD2) dimensions,
+      business_key must be the same composite key used to generate the
+      surrogate key (e.g. natural key plus a version discriminator), not
+      just the natural key alone.
+    arguments:
+      - name: business_key
+        type: string or list
+        description: The exact key (or composite key) used to generate the surrogate key.
+      - name: surrogate_key_column
+        type: string
+        description: The surrogate key column to check.

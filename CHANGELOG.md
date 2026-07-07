@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.6.0 - 2026-07-07
+
+A generic dbt test for surrogate key generation correctness, verified end-to-end against Snowflake via `integration_tests/`.
+
+### Added
+
+- **Star schema**: `surrogate_key_is_deterministic` — generic dbt test asserting each distinct business key maps to exactly one surrogate key value. Catches a surrogate key generation bug (e.g. a column left out of the hash inputs) that a plain `unique` test on the key column can't, since `unique` only proves no duplicates, not consistent derivation. Shares the same Type-2 composite-key requirement as `generate_dimension()`/`surrogate_key()` — `business_key` must match the exact key used to generate the surrogate key.
+
 ## 0.5.0 - 2026-07-07
 
 A generic dbt test for SCD2 dimension history integrity, verified end-to-end against Snowflake via `integration_tests/`.

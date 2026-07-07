@@ -190,6 +190,21 @@ models:
 
 Asserts no two historical versions of the same business key have overlapping `[dbt_valid_from, dbt_valid_to)` windows. `business_key` accepts a single column or a list; `valid_from_column`/`valid_to_column` default to dbt's native snapshot columns but can be overridden.
 
+`surrogate_key_is_deterministic` is a generic dbt test for dimension tables: it catches a surrogate key *generation* bug that a plain `unique` test on the key column can't — `unique` only proves no duplicates exist, not that the same business key always produces the same surrogate key:
+
+```yaml
+# schema.yml
+models:
+  - name: dim_customer
+    tests:
+      - clearpoint_dbt_utils.surrogate_key_is_deterministic:
+          arguments:
+            business_key: customer_id
+            surrogate_key_column: customer_key
+```
+
+**For Type-2 dimensions**, `business_key` here must be the *same* composite key used to generate the surrogate key (e.g. `[customer_id, dbt_valid_from]`), not just the natural key alone — otherwise every legitimate historical version (which correctly has a different surrogate key for the same natural key) triggers a false failure. This is the same composite-key rule as `generate_dimension()`'s Type-2 guidance, applied here too.
+
 ## Dependencies
 
 This package depends on [dbt-labs/dbt_utils](https://github.com/dbt-labs/dbt-utils).
