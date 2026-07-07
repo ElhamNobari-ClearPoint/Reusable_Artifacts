@@ -1,0 +1,18 @@
+macros:
+  - name: no_overlapping_scd2_periods
+    description: >
+      Generic dbt test for Type-2 (SCD2) dimensions: asserts no two
+      historical versions of the same business key have overlapping
+      validity windows ([valid_from, valid_to), exclusive upper bound).
+      Catches bad SCD2 history data at the dimension itself, before it can
+      cause a fanout in a downstream fact join.
+    arguments:
+      - name: business_key
+        type: string or list
+        description: Natural/business key column(s).
+      - name: valid_from_column
+        type: string
+        description: Defaults to 'dbt_valid_from'.
+      - name: valid_to_column
+        type: string
+        description: Defaults to 'dbt_valid_to'.

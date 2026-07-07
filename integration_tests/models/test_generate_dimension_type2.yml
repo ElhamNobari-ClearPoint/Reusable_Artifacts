@@ -8,6 +8,9 @@ models:
       - clearpoint_dbt_utils.one_current_record_per_key:
           arguments:
             business_key: customer_id
+      - clearpoint_dbt_utils.no_overlapping_scd2_periods:
+          arguments:
+            business_key: customer_id
     columns:
       - name: customer_key
         tests:

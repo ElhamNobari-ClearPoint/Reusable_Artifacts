@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.5.0 - 2026-07-07
+
+A generic dbt test for SCD2 dimension history integrity, verified end-to-end against Snowflake via `integration_tests/`.
+
+### Added
+
+- **SCD Type 2**: `no_overlapping_scd2_periods` — generic dbt test asserting no two historical versions of the same business key have overlapping `[dbt_valid_from, dbt_valid_to)` windows. Catches bad SCD2 history at the dimension itself, proactively, complementing `fact_join_fanout_check`'s reactive detection downstream in a fact join. Complements rather than replaces `one_current_record_per_key` — the two check different things (full history vs. just the current row) and should both be applied to a Type-2 dimension.
+
 ## 0.4.0 - 2026-07-07
 
 A generic dbt test for fact table join integrity, verified end-to-end against Snowflake via `integration_tests/`.

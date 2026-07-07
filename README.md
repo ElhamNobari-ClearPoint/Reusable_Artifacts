@@ -176,6 +176,20 @@ models:
 
 It compares, per `fact_key` value, the row count in `source_relation` (before any dimension joins) against the row count in the fact model itself (after them) — any mismatch fails. `fact_key` must be unique in `source_relation` for the comparison to be meaningful.
 
+`no_overlapping_scd2_periods` is a generic dbt test for Type-2 dimensions: it catches bad SCD2 history *at the dimension itself*, before it can cause a fanout in a downstream fact join — the same class of bug `fact_join_fanout_check` catches, but proactively rather than reactively:
+
+```yaml
+# schema.yml
+models:
+  - name: dim_customer_snapshot
+    tests:
+      - clearpoint_dbt_utils.no_overlapping_scd2_periods:
+          arguments:
+            business_key: customer_id
+```
+
+Asserts no two historical versions of the same business key have overlapping `[dbt_valid_from, dbt_valid_to)` windows. `business_key` accepts a single column or a list; `valid_from_column`/`valid_to_column` default to dbt's native snapshot columns but can be overridden.
+
 ## Dependencies
 
 This package depends on [dbt-labs/dbt_utils](https://github.com/dbt-labs/dbt-utils).
