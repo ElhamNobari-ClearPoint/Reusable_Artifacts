@@ -97,6 +97,56 @@ left join {{ ref('dim_customer_snapshot') }} d
 
 `fact_key`/`dim_key` each accept a single column name or a list of columns (for composite business keys); `valid_from_column`/`valid_to_column` default to dbt's native snapshot columns (`dbt_valid_from`/`dbt_valid_to`) but can be overridden. If a fact event falls in a gap — after a dimension version closed with no later replacement (e.g. a hard-deleted business key) — the join correctly produces `NULL` rather than falsely matching a stale or wrong version.
 
+`generate_dimension()` is a full statement generator — unlike the snippet-style macros above, it composes `surrogate_key()`, `audit_columns()`, and (optionally) `scd2_current_flag()` into a complete `select`, so a simple dimension model's entire `.sql` file can be one macro call:
+
+```sql
+-- models/dim_customer.sql
+{{ clearpoint_dbt_utils.generate_dimension(
+    source_relation=ref('stg_customers'),
+    business_key='customer_id',
+    surrogate_key_alias='customer_key',
+    attribute_columns=['name', 'email', 'status']
+) }}
+```
+
+For a **Type-2** dimension (`source_relation` is an SCD2 snapshot), pass `include_current_flag=true` to append `_is_current`, and — importantly — make `business_key` a composite of the natural key plus a version discriminator (e.g. `['customer_id', 'dbt_valid_from']`), not just the natural key alone. Otherwise every historical version of the same customer collapses to the *same* surrogate key, since `surrogate_key()` hashes exactly what it's given:
+
+```sql
+{{ clearpoint_dbt_utils.generate_dimension(
+    source_relation=ref('dim_customer_snapshot'),
+    business_key=['customer_id', 'dbt_valid_from'],
+    surrogate_key_alias='customer_key',
+    attribute_columns=['name', 'email', 'status', 'dbt_valid_to'],
+    include_current_flag=true
+) }}
+```
+
+`generate_fact()` is the fact-table counterpart: measures plus one or more resolved dimension surrogate keys, each lookup either a plain equality join or a point-in-time join via `scd2_asof_join()`:
+
+```sql
+-- models/fct_orders.sql
+{{ clearpoint_dbt_utils.generate_fact(
+    source_relation=ref('stg_orders'),
+    fact_key='order_id',
+    measure_columns=['order_amount', 'order_date'],
+    dimension_lookups=[
+        {
+            'relation': ref('dim_customer_snapshot'), 'alias': 'dim_customer',
+            'fact_key': 'customer_id', 'dim_key': 'customer_id',
+            'surrogate_key_column': 'customer_key',
+            'asof': true, 'fact_ts': 'order_date'
+        },
+        {
+            'relation': ref('dim_product'), 'alias': 'dim_product',
+            'fact_key': 'product_id', 'dim_key': 'product_id',
+            'surrogate_key_column': 'product_key'
+        }
+    ]
+) }}
+```
+
+Each `dimension_lookups` entry needs `relation`, a unique `alias`, `fact_key`/`dim_key` (join columns — string or list), and `surrogate_key_column` (the column to pull from the dimension). Add `asof: true` and `fact_ts` for a point-in-time lookup against an SCD2 dimension; omit them for a plain equality join against a Type-1 dimension. `generate_fact()` does not generate a surrogate key for the fact row itself — `fact_key` is selected as-is.
+
 ## Dependencies
 
 This package depends on [dbt-labs/dbt_utils](https://github.com/dbt-labs/dbt-utils).

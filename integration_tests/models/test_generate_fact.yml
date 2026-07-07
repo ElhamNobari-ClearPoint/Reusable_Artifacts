@@ -1,0 +1,11 @@
+models:
+  - name: test_generate_fact
+    description: >
+      Validates generate_fact(), combining a point-in-time (asof) dimension
+      lookup against an SCD2 customer dimension with a plain equality lookup
+      against a Type-1 product dimension.
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null

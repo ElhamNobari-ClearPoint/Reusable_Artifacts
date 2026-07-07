@@ -1,0 +1,20 @@
+models:
+  - name: test_generate_dimension_type2
+    description: >
+      Validates generate_dimension() for a Type-2 (SCD2 snapshot-sourced)
+      dimension, using a composite business_key (natural key + dbt_valid_from)
+      so the surrogate key is unique per historical row, not just per customer.
+    columns:
+      - name: customer_key
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        tests:
+          - not_null
+      - name: _is_current
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [true, false]

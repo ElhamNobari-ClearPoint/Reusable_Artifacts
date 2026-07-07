@@ -19,7 +19,7 @@ package/               — the actual installable dbt package (this is the `loca
     audit/        — standard audit/metadata columns
     scd/          — SCD Type 2: downstream-consumption macros only, NOT snapshot-config macros (see below)
     staging/      — Bronze -> Silver ODS staging patterns (e.g. dedupe_latest_record, Snowflake QUALIFY-based)
-    star_schema/  — dimension/fact table generators: surrogate_key (wraps dbt_utils.generate_surrogate_key with a '_key'-suffix naming rule), scd2_asof_join (fact-to-SCD2-dimension point-in-time join condition)
+    star_schema/  — dimension/fact table generators: surrogate_key (wraps dbt_utils.generate_surrogate_key with a '_key'-suffix naming rule), scd2_asof_join (fact-to-SCD2-dimension point-in-time join condition), generate_dimension and generate_fact (full-statement generators composing the other star_schema/audit macros)
     utils/        — shared helpers used by the above
 integration_tests/     — sibling dev project, installs the package via `local: ../package`
   dbt_project.yml      — profile: integration_tests
@@ -36,6 +36,9 @@ Each macro file `package/macros/<area>/<macro_name>.sql` has a sibling `package/
 - Macro files and macro names: `snake_case`, one primary macro per file, file name matches macro name (`audit_columns.sql` → `{% macro audit_columns(...) %}`).
 - Metadata/audit columns use a **leading underscore**, `snake_case` style: `_loaded_at`, `_dbt_invocation_id`, `_load_source`. This visually separates pipeline metadata from business columns. Don't switch to a `dbt_`-prefix style — underscore-prefix was chosen deliberately over that alternative.
 - Macros that emit column lists for splicing into a `select` (e.g. `audit_columns()`) return a **leading-comma** list (`, col_a\n, col_b`), not a trailing-comma list — this lets callers append the macro output straight after their own column list without comma bookkeeping.
+- Most macros return composable snippets (column lists, ON-clause conditions, QUALIFY clauses), not full statements — this is deliberate, confirmed with the user, and should stay the default. `generate_dimension()` and `generate_fact()` are the intentional exceptions (full-statement generators, by explicit user choice) — don't casually convert other macros to this shape without the same kind of confirmation.
+- `generate_fact()`'s `dimension_lookups` argument is a list of plain dicts (not a Jinja/dbt object) — keys are accessed with `lookup['key']` and `lookup.get('key', default)` inside the macro. This works because dbt's Jinja environment allows normal Python dict method calls; don't assume this generalizes to arbitrary objects passed through `ref()`/`source()`, which are `Relation` objects, not dicts.
+- **Type-2 dimension gotcha**: when calling `generate_dimension()` (or `surrogate_key()` directly) against an SCD2 snapshot, `business_key` must be a composite of the natural key plus a version discriminator (e.g. `['customer_id', 'dbt_valid_from']`), never just the natural key alone. `surrogate_key()` hashes exactly what it's given — a natural-key-only surrogate key collapses every historical version of the same entity to one identical key, silently breaking row-level uniqueness. Verified with an integration test (`assert_generate_dimension_type2_keys_unique_per_version.sql`) — don't regress this.
 
 ## Medallion terminology used in this package
 

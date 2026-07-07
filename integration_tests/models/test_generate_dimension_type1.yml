@@ -1,0 +1,24 @@
+models:
+  - name: test_generate_dimension_type1
+    description: Validates generate_dimension() for a Type-1 (non-SCD) dimension.
+    columns:
+      - name: customer_key
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+      - name: _loaded_at
+        tests:
+          - not_null
+      - name: _dbt_invocation_id
+        tests:
+          - not_null
+      - name: _load_source
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['test_generate_dimension_type1']

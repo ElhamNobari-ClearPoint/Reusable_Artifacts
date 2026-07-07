@@ -1,0 +1,36 @@
+macros:
+  - name: generate_dimension
+    description: >
+      Generates a full SELECT statement for a star schema dimension table,
+      composing this package's surrogate_key(), audit_columns(), and
+      (optionally) scd2_current_flag() macros so a simple dimension model's
+      entire .sql file can be a single call to this macro.
+    arguments:
+      - name: source_relation
+        type: relation
+        description: >
+          The relation to select from, e.g. ref('stg_customers') or
+          ref('dim_customer_snapshot').
+      - name: business_key
+        type: string or list
+        description: Natural/business key column(s).
+      - name: surrogate_key_alias
+        type: string
+        description: >
+          Name for the surrogate key column. Must end with '_key' (enforced
+          by surrogate_key()).
+      - name: attribute_columns
+        type: list
+        description: >
+          Descriptive attribute column(s) to select as-is. Pass an empty
+          list if there are none.
+      - name: include_current_flag
+        type: boolean
+        description: >
+          Defaults to false. Set true when source_relation is an SCD2
+          snapshot, to append scd2_current_flag() to the generated select.
+      - name: load_source
+        type: string
+        description: >
+          Passed through to audit_columns(); defaults to the current
+          model's identifier when not supplied.

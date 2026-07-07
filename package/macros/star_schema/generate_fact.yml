@@ -1,0 +1,41 @@
+macros:
+  - name: generate_fact
+    description: >
+      Generates a full SELECT statement for a star schema fact table:
+      measures plus one or more resolved dimension surrogate keys, composing
+      this package's scd2_asof_join() (for point-in-time dimension lookups)
+      and audit_columns() so a fact model's entire .sql file can be a single
+      call to this macro.
+    arguments:
+      - name: source_relation
+        type: relation
+        description: The fact source to select from, e.g. ref('stg_orders').
+      - name: fact_key
+        type: string or list
+        description: >
+          Natural/business key column(s) of the fact source. Selected as-is;
+          this macro does not generate a surrogate key for the fact row itself.
+      - name: measure_columns
+        type: list
+        description: >
+          Measure/descriptive column(s) to select as-is. Pass an empty list
+          if there are none.
+      - name: dimension_lookups
+        type: list of dicts
+        description: >
+          One entry per dimension to resolve a surrogate key from. Each
+          entry has keys: relation (required), alias (required, unique join
+          alias), fact_key (required, fact-side join key column(s)), dim_key
+          (required, dimension-side join key column(s)), surrogate_key_column
+          (required, the dimension's surrogate key column to select into the
+          fact output), asof (optional boolean, defaults to false; set true
+          for a point-in-time join via scd2_asof_join()), and fact_ts
+          (required if asof is true; fact-side event timestamp column).
+      - name: fact_alias
+        type: string
+        description: Table alias for source_relation in the generated SQL. Defaults to 'f'.
+      - name: load_source
+        type: string
+        description: >
+          Passed through to audit_columns(); defaults to the current
+          model's identifier when not supplied.

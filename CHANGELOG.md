@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.2.0 - 2026-07-07
+
+Full-statement star schema generators, built on top of the 0.1.0 primitives (`surrogate_key()`, `audit_columns()`, `scd2_current_flag()`, `scd2_asof_join()`), verified end-to-end against Snowflake via `integration_tests/`.
+
+### Added
+
+- **Star schema**: `generate_dimension()` — full dimension SELECT generator composing `surrogate_key()`, `audit_columns()`, and (optionally) `scd2_current_flag()`; supports both Type-1 dimensions and Type-2 (SCD2 snapshot-sourced) dimensions via a composite `business_key` (natural key + version discriminator) for row-level surrogate key uniqueness.
+- **Star schema**: `generate_fact()` — full fact SELECT generator resolving one or more dimension surrogate keys per fact row, each lookup either a plain equality join or a point-in-time join via `scd2_asof_join()`, composed with `audit_columns()`.
+
 ## 0.1.0 - 2026-07-07
 
 Initial release. Package scaffold plus a first working macro in each of the four planned capability areas, all verified end-to-end against Snowflake via `integration_tests/`.
